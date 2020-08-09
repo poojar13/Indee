@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.indee.databinding.ListItemBinding;
 
 import java.text.ParseException;
