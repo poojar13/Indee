@@ -1,5 +1,6 @@
 package com.example.indee;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,11 @@ import java.util.Date;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
     ArrayList<MovieListItem.TestData> movieListItemArrayList = new ArrayList<>();
+    ImageLoader imageLoader;
+
+    public MovieAdapter(Context context) {
+        this.imageLoader = new ImageLoader(context);
+    }
 
     @NonNull
     @Override
@@ -91,7 +97,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
                 binding.releaseYear.setText(String.valueOf(testData.release_year));
             }
             if(!TextUtils.isEmpty(testData.posterLink)){
-               new DownloadImageTask(binding.poster,binding.progress).execute(testData.posterLink);
+//               new DownloadImageTask(binding.poster,binding.progress).execute(testData.posterLink);
+                imageLoader.DisplayImage(testData.posterLink,binding.poster);
             }
         }
         private String formattedDate(String dateString){

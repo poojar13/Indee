@@ -1,11 +1,17 @@
 package com.example.indee;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.example.indee.databinding.ActivityMainBinding;
 
@@ -32,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        movieAdapter = new MovieAdapter();
+        movieAdapter = new MovieAdapter(this);
         try {
             jsonObject = new JSONObject(getJson());
             movieListItem = jsonObject.getJSONArray("TestData");
@@ -61,8 +67,13 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        movieAdapter.addListItem(arrayList);
-        binding.recyclerView.setAdapter(movieAdapter);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            movieAdapter.addListItem(arrayList);
+            binding.recyclerView.setAdapter(movieAdapter);
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
     }
 
     private String getJson() throws IOException, JSONException {
@@ -83,7 +94,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        binding.recyclerView.setAdapter(null);
         super.onDestroy();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                movieAdapter.addListItem(arrayList);
+                binding.recyclerView.setAdapter(movieAdapter);
+            } else {
+                Toast.makeText(this, "Permission not granted", Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
 }
